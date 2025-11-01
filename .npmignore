@@ -1,0 +1,14 @@
+src/
+.vscode/
+.vscode-test/
+.github/
+.gitignore
+.eslintrc.json
+tsconfig.json
+*.md
+!README.md
+*.vsix
+node_modules/
+.DS_Store
+.git/
+

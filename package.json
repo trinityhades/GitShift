@@ -1,0 +1,374 @@
+{
+  "name": "gitshift",
+  "displayName": "GitShift",
+  "description": "Manage and seamlessly switch between multiple GitHub accounts within VS Code. Easily handle authentication, commit and push as different users, use personal access tokens, and keep your Git configuration in sync across workspaces. Ideal for developers with personal, work, or organizational GitHub accounts.",
+  "version": "1.0.0",
+  "publisher": "mikeeeyy04",
+  "icon": "images/icon.png",
+  "homepage": "https://github.com/mikeeeyy04/GitShift",
+  "bugs": {
+    "url": "https://github.com/mikeeeyy04/GitShift/issues"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Source Control",
+    "GitHub",
+    "Git",
+    "GitShift"
+  ],
+  "keywords": [
+    "git",
+    "github",
+    "account",
+    "switcher",
+    "identity",
+    "multiple accounts",
+    "personal access token",
+    "pat",
+    "token manager",
+    "authentication",
+    "git user",
+    "commit",
+    "push",
+    "source control",
+    "vcs",
+    "profiles",
+    "workspace",
+    "extension",
+    "vscode",
+    "code",
+    "open source"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitshift.switchAccount",
+        "title": "Switch Account",
+        "category": "GitShift",
+        "icon": "$(account)"
+      },
+      {
+        "command": "gitshift.showActiveAccount",
+        "title": "Show Active Account",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.refreshSidebar",
+        "title": "Refresh Sidebar",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "gitshift.refreshTreeView",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "gitshift.openConfig",
+        "title": "Open Configuration File",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "gitshift.signInWithGitHub",
+        "title": "GitHub: Sign In with GitHub",
+        "category": "GitShift",
+        "icon": "$(sign-in)"
+      },
+      {
+        "command": "gitshift.importAccounts",
+        "title": "GitHub: Import Active Session from VS Code",
+        "category": "GitShift",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "gitshift.linkAccount",
+        "title": "Link to GitHub",
+        "icon": "$(link)"
+      },
+      {
+        "command": "gitshift.quickCloneRepo",
+        "title": "Repository Quick Clone & Switch",
+        "category": "GitShift",
+        "icon": "$(repo)"
+      },
+      {
+        "command": "gitshift.addToken",
+        "title": "Add/Replace GitHub Token",
+        "category": "GitShift",
+        "icon": "$(key)"
+      },
+      {
+        "command": "gitshift.removeToken",
+        "title": "Remove GitHub Token",
+        "category": "GitShift",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "gitshift.pull",
+        "title": "Pull",
+        "category": "GitShift",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "gitshift.push",
+        "title": "Push",
+        "category": "GitShift",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "gitshift.sync",
+        "title": "Sync",
+        "category": "GitShift",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "gitshift.fetch",
+        "title": "Fetch",
+        "category": "GitShift",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "gitshift.refreshChanges",
+        "title": "Refresh",
+        "category": "GitShift",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "gitshift.moreActions",
+        "title": "More Actions...",
+        "category": "GitShift",
+        "icon": "$(ellipsis)"
+      },
+      {
+        "command": "gitshift.clone",
+        "title": "Clone Repository...",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.checkout",
+        "title": "Checkout to...",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.stash",
+        "title": "Stash Changes",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.stashPop",
+        "title": "Pop Stash",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.viewStashes",
+        "title": "View Stashes",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.createBranch",
+        "title": "Create Branch...",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.deleteBranch",
+        "title": "Delete Branch...",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.mergeBranch",
+        "title": "Merge Branch...",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.rebaseBranch",
+        "title": "Rebase Branch...",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.showGitOutput",
+        "title": "Show Git Output",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.initRepo",
+        "title": "Initialize Repository",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.publishToGitHub",
+        "title": "Publish to GitHub",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.addRemote",
+        "title": "Add Remote...",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.removeRemote",
+        "title": "Remove Remote...",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.viewRemotes",
+        "title": "View Remotes",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.pullRebase",
+        "title": "Pull (Rebase)",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.pushForce",
+        "title": "Push (Force)",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.discardAllChanges",
+        "title": "Discard All Changes",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.amendCommit",
+        "title": "Amend Last Commit",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.undoLastCommit",
+        "title": "Undo Last Commit",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.openGitHubProfile",
+        "title": "Open GitHub Profile",
+        "icon": "$(github-inverted)",
+        "category": "GitShift"
+      },
+      {
+        "command": "gitshift.refreshContributions",
+        "title": "Refresh Contributions",
+        "icon": "$(refresh)",
+        "category": "GitShift"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gitshift-accounts",
+          "title": "GitShift",
+          "icon": "images/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "gitshift-accounts": [
+        {
+          "type": "webview",
+          "id": "githubAccountsWebview",
+          "name": "GitShift Manager",
+          "openOnStartup": true
+        },
+        {
+          "type": "webview",
+          "id": "repositoryWebview",
+          "name": "Repository",
+          "icon": "images/icon.png",
+          "contextualTitle": "Repository",
+          "openOnStartup": true
+        },
+        {
+          "type": "webview",
+          "id": "contributionsWebview",
+          "name": "Profile & Contributions",
+          "icon": "$(graph)",
+          "contextualTitle": "GitHub Contributions",
+          "openOnStartup": false
+        },
+        {
+          "type": "webview",
+          "id": "supportWebview",
+          "name": "Support",
+          "openOnStartup": true
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "gitshift.quickCloneRepo",
+          "when": "view == githubAccountsWebview",
+          "group": "navigation@1"
+        },
+        {
+          "command": "gitshift.refreshSidebar",
+          "when": "view == githubAccountsWebview",
+          "group": "navigation@2"
+        },
+        {
+          "command": "gitshift.pull",
+          "when": "view == repositoryWebview",
+          "group": "navigation@1"
+        },
+        {
+          "command": "gitshift.push",
+          "when": "view == repositoryWebview",
+          "group": "navigation@2"
+        },
+        {
+          "command": "gitshift.sync",
+          "when": "view == repositoryWebview",
+          "group": "navigation@3"
+        },
+        {
+          "command": "gitshift.refreshChanges",
+          "when": "view == repositoryWebview",
+          "group": "navigation@4"
+        },
+        {
+          "command": "gitshift.moreActions",
+          "when": "view == repositoryWebview",
+          "group": "navigation@5"
+        },
+        {
+          "command": "gitshift.openGitHubProfile",
+          "when": "view == contributionsWebview",
+          "group": "navigation@1"
+        },
+        {
+          "command": "gitshift.refreshContributions",
+          "when": "view == contributionsWebview",
+          "group": "navigation@2"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package",
+    "clean": "rimraf out"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^6.x",
+    "@typescript-eslint/parser": "^6.x",
+    "@vscode/vsce": "^3.6.2",
+    "eslint": "^8.x",
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikeeeyy04/GitShift.git"
+  },
+  "license": "MIT"
+}
