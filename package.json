@@ -13,10 +13,8 @@
     "vscode": "^1.90.0"
   },
   "categories": [
-    "Source Control",
-    "GitHub",
-    "Git",
-    "GitShift"
+    "SCM Providers",
+    "Other"
   ],
   "keywords": [
     "git",
