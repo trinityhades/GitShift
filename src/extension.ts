@@ -18,7 +18,7 @@ import { SupportProvider } from './supportWebview';
 import { GitHubAccount } from './types';
 import { signInToGitHub, getGitHubUser, getGitHubEmails, getGitHubSessions, getGitHubSessionByAccountId, initAuthSecrets, validateGitHubToken, storeGitHubToken, deleteGitHubToken, getGitHubToken, checkRepoAccess, checkCollaboratorAccess, getAllStoredTokens, createGitHubRepository } from './githubAuth';
 import { quickCloneRepository } from './repoQuickClone';
-import { configureGitCredentials, updateRemoteUrlWithToken, getRemoteUrl, parseGitHubUrl } from './gitCredentials';
+import { configureGitCredentials, updateRemoteUrlWithToken, getRemoteUrl, parseGitHubUrl, migrateEmbeddedCredentials } from './gitCredentials';
 
 // Global instances
 let treeProvider: any;
@@ -386,12 +386,40 @@ export async function activate(context: vscode.ExtensionContext) {
         }
         await saveAccounts(accounts);
 
+        // Check if this account is currently active and update Git remote URL if it is
+        const currentGitUser = await getCurrentGitUser();
+        const isCurrentlyActive = currentGitUser && (
+          currentGitUser.email === primaryEmail ||
+          currentGitUser.name === (user.name || user.login)
+        );
+
+        const isGitRepo = await isGitRepository();
+
+        if (isCurrentlyActive && isGitRepo) {
+          // This account is currently active, update Git remote URL with new token immediately
+          try {
+            // Reconfigure Git credentials with new token
+            await configureGitCredentials(user.login, token);
+            
+            // Update remote URL with new token
+            const remoteUrl = await getRemoteUrl('origin');
+            if (remoteUrl && remoteUrl.includes('github.com')) {
+              const repoInfo = parseGitHubUrl(remoteUrl);
+              if (repoInfo) {
+                await updateRemoteUrlWithToken('origin', token, user.login);
+              }
+            }
+          } catch (error: any) {
+            // Log error but don't fail the token save
+            console.warn(`Failed to update Git remote URL: ${error.message}`);
+          }
+        }
+
         vscode.window.showInformationMessage(`Token saved for ${user.login}.`);
         if (treeProvider) treeProvider.refresh();
         if (sidebarProvider) sidebarProvider.refresh();
 
         // Auto-activate this account if none is currently active
-        const isGitRepo = await isGitRepository();
         if (isGitRepo) {
           await autoActivateFirstAccount().catch(() => {
             // Silent failure
@@ -1353,7 +1381,7 @@ export async function activate(context: vscode.ExtensionContext) {
       if (e.provider.id === 'github') {
         try {
           // Get the current GitHub session
-          const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user'], {
+          const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'workflow'], {
             createIfNone: false,
             silent: true
           });
@@ -1425,6 +1453,19 @@ export async function activate(context: vscode.ExtensionContext) {
   }).catch((error) => {
     console.error('[GitShift] Auto-import failed:', error);
   });
+
+  // Migrate any existing embedded credentials to secure storage (one-time migration)
+  setTimeout(async () => {
+    try {
+      const isGitRepo = await isGitRepository();
+      if (isGitRepo) {
+        await migrateEmbeddedCredentials();
+      }
+    } catch (error) {
+      // Silent failure - migration is optional
+      console.warn('[GitShift] Credential migration failed:', error);
+    }
+  }, 3000); // Run after other initialization
 
   // Also check periodically if accounts exist but no user is active
   // This handles cases where accounts were loaded but git config wasn't set
@@ -2909,6 +2950,10 @@ async function showTokenTutorial(_account?: GitHubAccount): Promise<void> {
                     <div class="scope-name"><i class="codicon codicon-account" style="margin-right:4px; vertical-align:middle;"></i>read:user</div>
                     <div class="scope-desc">Read user profile data (required to see all contributions, including public repos)</div>
                 </div>
+                <div class="scope-item">
+                    <div class="scope-name"><i class="codicon codicon-sync" style="margin-right:4px; vertical-align:middle;"></i>workflow</div>
+                    <div class="scope-desc">Update GitHub Action workflows (required for workflow management)</div>
+                </div>
             </div>
             <p style="margin-top: 12px;"><strong>Important:</strong> 
             <ul style="margin-top: 8px; margin-left: 20px;">
@@ -2917,7 +2962,7 @@ async function showTokenTutorial(_account?: GitHubAccount): Promise<void> {
             </ul>
             </p>
             <p style="margin-top: 12px; padding: 8px; background: var(--vscode-textBlockQuote-background); border-left: 3px solid var(--vscode-textLink-foreground);">
-                <strong><i class="codicon codicon-lightbulb" style="margin-right:4px;"></i>Tip:</strong> If you prefer, you can use <strong>"Sign In with GitHub"</strong> instead, which automatically includes all required scopes (repo, user:email, read:user)!
+                <strong><i class="codicon codicon-lightbulb" style="margin-right:4px;"></i>Tip:</strong> If you prefer, you can use <strong>"Sign In with GitHub"</strong> instead, which automatically includes all required scopes (repo, user:email, read:user, workflow)!
             </p>
         </div>
     </div>
@@ -2962,7 +3007,7 @@ async function showTokenTutorial(_account?: GitHubAccount): Promise<void> {
       panel.webview.onDidReceiveMessage(async (message) => {
         if (message.command === 'openTokenPage') {
           // Open GitHub token creation page with pre-filled parameters
-          const tokenUrl = 'https://github.com/settings/tokens/new?scopes=repo,user:email,read:user&description=GitShift+for+VS+Code';
+          const tokenUrl = 'https://github.com/settings/tokens/new?scopes=repo,user:email,read:user,workflow&description=GitShift+for+VS+Code';
           await vscode.env.openExternal(vscode.Uri.parse(tokenUrl));
         } else if (message.command === 'proceed') {
           // Close tutorial and proceed to token input

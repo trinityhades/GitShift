@@ -482,6 +482,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
                 </div>
                 <div class="scope-item">
                     <div class="scope-name">
+                        <i class="codicon codicon-sync" style="margin-right:4px; vertical-align:middle;"></i>
+                        workflow
+                    </div>
+                    <div class="scope-desc">Update GitHub Action workflows (required for workflow management)</div>
+                </div>
+                <div class="scope-item">
+                    <div class="scope-name">
                         <i class="codicon codicon-bell" style="margin-right:4px; vertical-align:middle;"></i>
                         notifications
                     </div>
@@ -496,7 +503,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             </ul>
             </p>
             <p style="margin-top: 12px; padding: 8px; background: var(--vscode-textBlockQuote-background); border-left: 3px solid var(--vscode-textLink-foreground);">
-                <strong><i class="codicon codicon-lightbulb" style="margin-right:4px;"></i>Tip:</strong> If you prefer, you can use <strong>"Sign In with GitHub"</strong> instead, which automatically includes all required scopes (repo, user:email, read:user, notifications)!
+                <strong><i class="codicon codicon-lightbulb" style="margin-right:4px;"></i>Tip:</strong> If you prefer, you can use <strong>"Sign In with GitHub"</strong> instead, which automatically includes all required scopes (repo, user:email, read:user, workflow, notifications)!
             </p>
         </div>
     </div>
@@ -541,7 +548,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         panel.webview.onDidReceiveMessage(async (message) => {
           if (message.command === 'openTokenPage') {
             // Open GitHub token creation page with pre-filled parameters
-            const tokenUrl = 'https://github.com/settings/tokens/new?scopes=repo,user:email,read:user,notifications&description=GitShift+for+VS+Code';
+            const tokenUrl = 'https://github.com/settings/tokens/new?scopes=repo,user:email,read:user,workflow,notifications&description=GitShift+for+VS+Code';
             await vscode.env.openExternal(vscode.Uri.parse(tokenUrl));
           } else if (message.command === 'proceed') {
             // Close tutorial and proceed to token input

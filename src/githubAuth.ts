@@ -111,7 +111,7 @@ export async function signInToGitHub(forceNew: boolean = false): Promise<GitHubS
             ? { forceNewSession: true }
             : { createIfNone: true };
 
-        const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'notifications'], options);
+        const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'workflow', 'notifications'], options);
 
         if (!session) {
             return null;
@@ -146,7 +146,7 @@ export async function signInToGitHub(forceNew: boolean = false): Promise<GitHubS
 export async function getGitHubSessionByAccountId(accountId: string): Promise<GitHubSession | null> {
     try {
         // First, try to get the current session silently
-        const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'notifications'], {
+        const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'workflow', 'notifications'], {
             createIfNone: false,
             clearSessionPreference: false,
             silent: true
@@ -183,8 +183,8 @@ export async function getGitHubSessionByAccountId(accountId: string): Promise<Gi
 export async function getGitHubSessions(): Promise<GitHubSession[]> {
     try {
         // Try to get the current GitHub session silently
-        // We request 'repo', 'user:email', and 'read:user' scopes to get the full session
-        const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'notifications'], {
+        // We request 'repo', 'user:email', 'read:user', 'workflow', and 'notifications' scopes to get the full session
+        const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'workflow', 'notifications'], {
             createIfNone: false,
             silent: true
         });
@@ -214,7 +214,7 @@ export async function getGitHubSessions(): Promise<GitHubSession[]> {
  */
 export async function getCurrentGitHubSessionWithPrompt(): Promise<GitHubSession | null> {
     try {
-        const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'notifications'], {
+        const session = await vscode.authentication.getSession('github', ['repo', 'user:email', 'read:user', 'workflow', 'notifications'], {
             createIfNone: true,
             silent: false
         });

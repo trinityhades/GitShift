@@ -62,7 +62,7 @@ code --install-extension mikeeeyy04.gitshift
 
 ### Method 2: Manual Setup with Personal Access Token
 
-1. Create a GitHub Personal Access Token with `repo`, `user:email`, and `read:user` scopes
+1. Create a GitHub Personal Access Token with `repo`, `user:email`, `read:user`, and `workflow` scopes
 2. Open a Git repository in VS Code
 3. Click the GitShift icon in the Activity Bar
 4. Click **"Add/Replace GitHub Token"**
@@ -315,7 +315,7 @@ git init
 1. Verify Git is installed: `git --version`
 2. Ensure Git is in your system PATH
 3. Check workspace folder permissions
-4. For authenticated accounts, verify your token has the correct scopes (`repo`, `user:email`, `read:user`)
+4. For authenticated accounts, verify your token has the correct scopes (`repo`, `user:email`, `read:user`, `workflow`)
 
 ### Token authentication issues
 
@@ -323,6 +323,7 @@ git init
    - `repo` - Full control of private repositories
    - `user:email` - Access user email addresses
    - `read:user` - Read user profile data
+   - `workflow` - Update GitHub Action workflows
    - `notifications` - Access notifications (optional)
 2. Try removing and re-adding the token
 3. Check if the token has expired
