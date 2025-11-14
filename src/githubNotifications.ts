@@ -60,7 +60,9 @@ export async function fetchNotifications(token: string, all: boolean = false): P
             reason: notif.reason,
             subject: {
                 title: notif.subject.title,
-                url: notif.subject.url.replace('https://api.github.com/repos/', 'https://github.com/').replace('/pulls/', '/pull/'),
+                url: notif.subject.url 
+                    ? notif.subject.url.replace('https://api.github.com/repos/', 'https://github.com/').replace('/pulls/', '/pull/')
+                    : `https://github.com/${notif.repository.full_name}`,
                 type: notif.subject.type
             },
             repository: {

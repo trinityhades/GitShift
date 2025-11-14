@@ -44,7 +44,7 @@ async function ensureVSCodeDirectory(): Promise<void> {
 }
 
 /**
- * Ensures the accounts file is added to .gitignore inside .vscode folder
+ * Ensures the accounts file is added to .gitignore in the workspace root
  * This prevents committing personal account configuration
  */
 async function ensureGitignore(): Promise<void> {
@@ -53,14 +53,11 @@ async function ensureGitignore(): Promise<void> {
     return;
   }
 
-  // Ensure .vscode directory exists first
-  await ensureVSCodeDirectory();
-
-  // Create .gitignore inside .vscode folder
-  const gitignorePath = vscode.Uri.joinPath(workspaceFolders[0].uri, '.vscode', '.gitignore');
+  // Use the root .gitignore file
+  const gitignorePath = vscode.Uri.joinPath(workspaceFolders[0].uri, '.gitignore');
 
   try {
-    // Try to read existing .vscode/.gitignore
+    // Try to read existing .gitignore
     let gitignoreContent = '';
     try {
       const fileContent = await vscode.workspace.fs.readFile(gitignorePath);
@@ -76,8 +73,9 @@ async function ensureGitignore(): Promise<void> {
       const trimmed = line.trim();
       return trimmed === GITIGNORE_ENTRY ||
         trimmed === '/github-accounts.json' ||
-        trimmed === 'github-accounts.json' ||
-        (trimmed === '# GitShift' && lines[index + 1]?.trim() === GITIGNORE_ENTRY);
+        trimmed === '.vscode/github-accounts.json' ||
+        trimmed === '**/' + GITIGNORE_ENTRY ||
+        (trimmed === '# GitShift' && lines[index + 1]?.trim() === '**/' + GITIGNORE_ENTRY);
     });
 
     if (!entryExists) {
@@ -96,19 +94,17 @@ async function ensureGitignore(): Promise<void> {
 
       // Add comment and entry
       newContent += '# GitShift personal account configuration\n';
-      newContent += GITIGNORE_ENTRY + '\n';
+      newContent += '**/' + GITIGNORE_ENTRY + '\n';
 
-      // Write back to .vscode/.gitignore
+      // Write back to .gitignore
       await vscode.workspace.fs.writeFile(
         gitignorePath,
         Buffer.from(newContent, 'utf8')
       );
-
-
     }
   } catch (error) {
     // Silent failure - don't block account creation if .gitignore fails
-    console.warn('Failed to update .vscode/.gitignore:', error);
+    console.warn('Failed to update .gitignore:', error);
   }
 }
 
@@ -140,6 +136,20 @@ export async function loadAccounts(): Promise<GitHubAccount[]> {
   } catch (error: any) {
     if (error.code === 'FileNotFound') {
       // File doesn't exist, return empty array
+      return [];
+    }
+    // Handle JSON parsing errors by backing up corrupted file and starting fresh
+    if (error instanceof SyntaxError && error.message.includes('JSON')) {
+      try {
+        // Backup the corrupted file
+        const backupPath = vscode.Uri.joinPath(accountsFilePath, '..', 'github-accounts.json.backup');
+        await vscode.workspace.fs.copy(accountsFilePath, backupPath, { overwrite: true });
+        vscode.window.showWarningMessage('Corrupted accounts file detected. Created backup and resetting accounts. Please re-import your accounts.');
+      } catch (backupError) {
+        // If backup fails, just show warning
+        vscode.window.showWarningMessage('Corrupted accounts file detected. Resetting accounts. Please re-import your accounts.');
+      }
+      // Return empty array to allow fresh import
       return [];
     }
     throw error;

@@ -1,3 +1,11 @@
+/**
+ * GitShift - Contributions Webview Provider
+ * Copyright (c) 2025 mikeeeyy04
+ * https://github.com/mikeeeyy04/GitShift
+ * 
+ * MIT License - See LICENSE file for details
+ */
+
 import * as vscode from 'vscode';
 import { GitHubAccount } from './types';
 import { loadAccounts } from './accountManager';
@@ -605,9 +613,15 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: var(--vscode-sideBar-background);
+      font-family: var(--vscode-font-family);
+      background: transparent;
       color: var(--vscode-foreground);
       padding: 20px;
       display: flex;
@@ -615,10 +629,33 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       justify-content: center;
       min-height: 200px;
     }
+
+    .loading-container {
+      text-align: center;
+      color: var(--vscode-descriptionForeground);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--vscode-panel-border);
+      border-top-color: var(--vscode-foreground);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <div>Loading contributions...</div>
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <div>Loading contributions...</div>
+  </div>
 </body>
 </html>`;
   }
@@ -657,46 +694,61 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-family: var(--vscode-font-family);
       background: transparent;
       color: var(--vscode-foreground);
-      padding: clamp(8px, 2.5vw, 16px);
-      font-size: clamp(12px, 3vw, 13px);
+      padding: 12px;
+      font-size: 13px;
       line-height: 1.5;
     }
 
+    .codicon[class*='codicon-'] {
+      font-size: 14px !important;
+    }
+
     .section {
-      margin-bottom: clamp(16px, 4vw, 24px);
+      margin-bottom: 16px;
     }
 
     .section-header {
-      font-size: clamp(10px, 2.5vw, 11px);
-      font-weight: 500;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--vscode-descriptionForeground);
-      margin-bottom: clamp(12px, 3vw, 16px);
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .section-header i {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .section-header > div:first-child {
+      flex: 1;
+      min-width: 0;
     }
 
     .account-header {
       background: var(--vscode-editor-background);
       border: 1px solid var(--vscode-panel-border);
-      border-radius: 6px;
-      padding: clamp(12px, 3vw, 16px);
-      margin-bottom: clamp(16px, 4vw, 24px);
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
-      gap: clamp(10px, 2.5vw, 14px);
+      gap: 12px;
       transition: all 0.2s ease;
     }
 
     .account-avatar {
-      width: clamp(40px, 10vw, 48px);
-      height: clamp(40px, 10vw, 48px);
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       border: 2px solid var(--vscode-panel-border);
       flex-shrink: 0;
@@ -708,7 +760,7 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     }
 
     .account-name {
-      font-size: clamp(13px, 3.2vw, 15px);
+      font-size: 14px;
       font-weight: 600;
       color: var(--vscode-foreground);
       margin-bottom: 4px;
@@ -718,7 +770,7 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     }
 
     .account-username {
-      font-size: clamp(11px, 2.8vw, 12px);
+      font-size: 12px;
       color: var(--vscode-descriptionForeground);
       white-space: nowrap;
       overflow: hidden;
@@ -728,15 +780,15 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: clamp(8px, 2vw, 12px);
-      margin-bottom: clamp(16px, 4vw, 24px);
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .stat-card {
       background: var(--vscode-editor-background);
       border: 1px solid var(--vscode-panel-border);
-      border-radius: 6px;
-      padding: clamp(10px, 2.5vw, 14px);
+      border-radius: 4px;
+      padding: 12px;
       text-align: center;
       transition: all 0.2s ease;
       cursor: default;
@@ -745,53 +797,64 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     .stat-card:hover {
       border-color: var(--vscode-focusBorder);
       transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .stat-value {
-      font-size: clamp(18px, 4.5vw, 24px);
+      font-size: 20px;
       font-weight: 700;
       color: var(--vscode-foreground);
       margin-bottom: 4px;
       line-height: 1.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
     .stat-label {
-      font-size: clamp(10px, 2.5vw, 11px);
+      font-size: 10px;
       color: var(--vscode-descriptionForeground);
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      font-weight: 600;
     }
 
     .stat-icon {
-      font-size: clamp(12px, 3vw, 14px);
-      margin-right: 4px;
-      vertical-align: middle;
+      font-size: 14px;
+      opacity: 0.8;
     }
 
     .graph-container {
       background: var(--vscode-editor-background);
       border: 1px solid var(--vscode-panel-border);
-      border-radius: 6px;
-      padding: clamp(14px, 3.5vw, 18px);
-      margin-bottom: clamp(16px, 4vw, 24px);
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 16px;
     }
 
     .graph-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: clamp(12px, 3vw, 16px);
+      margin-bottom: 12px;
       flex-wrap: wrap;
       gap: 12px;
     }
 
     .graph-title {
-      font-size: clamp(10px, 2.5vw, 11px);
-      font-weight: 500;
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--vscode-descriptionForeground);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .graph-title i {
+      font-size: 14px;
+      opacity: 0.8;
     }
 
     .year-selector {
@@ -804,31 +867,30 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       background: var(--vscode-dropdown-background);
       border: 1px solid var(--vscode-dropdown-border);
       color: var(--vscode-foreground);
-      padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 12px);
+      padding: 6px 12px;
       border-radius: 4px;
-      font-size: clamp(11px, 2.8vw, 12px);
+      font-size: 12px;
       font-weight: 500;
       cursor: pointer;
       outline: none;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat;
       background-position: right 8px center;
-      background-size: 16px;
+      background-size: 14px;
       padding-right: 32px;
     }
 
     .year-select:hover {
-      background-color: var(--vscode-dropdown-listBackground);
+      background-color: var(--vscode-list-hoverBackground);
       border-color: var(--vscode-focusBorder);
     }
 
     .year-select:focus {
       border-color: var(--vscode-focusBorder);
-      box-shadow: 0 0 0 2px var(--vscode-focusBorder);
     }
 
     .year-select option {
@@ -837,24 +899,18 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       padding: 4px 8px;
     }
 
-    /* Additional styling for dropdown to ensure theme consistency */
-    select.year-select {
-      background-color: var(--vscode-dropdown-background) !important;
-      color: var(--vscode-foreground) !important;
-    }
-
-    select.year-select * {
-      background-color: var(--vscode-dropdown-background) !important;
-      color: var(--vscode-foreground) !important;
-    }
-
     .total-contributions {
-      font-size: clamp(12px, 3vw, 14px);
+      font-size: 12px;
       font-weight: 600;
       color: var(--vscode-foreground);
       display: flex;
       align-items: center;
       gap: 6px;
+    }
+
+    .total-contributions i {
+      font-size: 14px;
+      opacity: 0.8;
     }
 
     .svg-wrapper {
@@ -864,7 +920,7 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       -webkit-overflow-scrolling: touch;
       max-width: 100%;
       min-width: 0;
-      margin-bottom: clamp(12px, 3vw, 16px);
+      margin-bottom: 12px;
     }
 
     /* Custom scrollbar matching other webviews */
@@ -901,9 +957,9 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: clamp(8px, 2vw, 12px);
-      margin-top: clamp(12px, 3vw, 16px);
-      font-size: clamp(10px, 2.5vw, 11px);
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 11px;
       color: var(--vscode-descriptionForeground);
       flex-wrap: wrap;
     }
@@ -912,6 +968,7 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       display: flex;
       align-items: center;
       gap: 6px;
+      font-weight: 500;
     }
 
     .legend-item {
@@ -929,7 +986,7 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
 
     .loading {
       text-align: center;
-      padding: clamp(40px, 10vw, 60px);
+      padding: 40px 20px;
       color: var(--vscode-descriptionForeground);
     }
 
@@ -940,7 +997,7 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       border: 2px solid var(--vscode-panel-border);
       border-top-color: var(--vscode-foreground);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.6s linear infinite;
       margin-bottom: 12px;
     }
 
@@ -951,8 +1008,8 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     .error {
       background: var(--vscode-inputValidation-errorBackground);
       border: 1px solid var(--vscode-inputValidation-errorBorder);
-      border-radius: 6px;
-      padding: clamp(16px, 4vw, 20px);
+      border-radius: 4px;
+      padding: 12px;
       color: var(--vscode-errorForeground);
     }
 
@@ -962,10 +1019,15 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       display: flex;
       align-items: center;
       gap: 6px;
+      font-size: 13px;
+    }
+
+    .error-title i {
+      font-size: 14px;
     }
 
     .error-message {
-      font-size: clamp(11px, 2.8vw, 12px);
+      font-size: 12px;
       line-height: 1.6;
       white-space: pre-wrap;
     }
@@ -973,10 +1035,10 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     .warning-banner {
       background: var(--vscode-inputValidation-warningBackground);
       border: 1px solid var(--vscode-inputValidation-warningBorder);
-      border-radius: 6px;
-      padding: clamp(12px, 3vw, 16px);
-      margin-bottom: clamp(16px, 4vw, 24px);
-      font-size: clamp(11px, 2.8vw, 12px);
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 12px;
       line-height: 1.6;
     }
 
@@ -987,16 +1049,21 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       align-items: center;
       gap: 6px;
       color: var(--vscode-notificationsWarningIcon-foreground);
+      font-size: 13px;
+    }
+
+    .warning-title i {
+      font-size: 14px;
     }
 
     .empty-state {
       text-align: center;
-      padding: clamp(40px, 10vw, 60px);
+      padding: 40px 20px;
       color: var(--vscode-descriptionForeground);
     }
 
     .empty-icon {
-      font-size: clamp(32px, 8vw, 48px);
+      font-size: 48px;
       margin-bottom: 12px;
       opacity: 0.5;
     }
@@ -1036,26 +1103,27 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     .breakdown-section {
       background: var(--vscode-editor-background);
       border: 1px solid var(--vscode-panel-border);
-      border-radius: 6px;
-      padding: clamp(12px, 3vw, 16px);
-      margin-bottom: clamp(16px, 4vw, 24px);
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 16px;
     }
 
     .breakdown-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: clamp(10px, 2.5vw, 14px);
-      margin-top: clamp(12px, 3vw, 16px);
+      gap: 8px;
+      margin-top: 12px;
     }
 
     .breakdown-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: clamp(8px, 2vw, 10px);
+      padding: 10px;
       background: var(--vscode-sideBar-background);
       border-radius: 4px;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
+      cursor: default;
     }
 
     .breakdown-item:hover {
@@ -1063,9 +1131,10 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     }
 
     .breakdown-icon {
-      font-size: clamp(14px, 3.5vw, 16px);
+      font-size: 16px;
       width: 20px;
       text-align: center;
+      opacity: 0.8;
     }
 
     .breakdown-content {
@@ -1074,25 +1143,26 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     }
 
     .breakdown-value {
-      font-size: clamp(13px, 3.2vw, 15px);
+      font-size: 14px;
       font-weight: 600;
       color: var(--vscode-foreground);
       line-height: 1.2;
     }
 
     .breakdown-label {
-      font-size: clamp(10px, 2.5vw, 11px);
+      font-size: 10px;
       color: var(--vscode-descriptionForeground);
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      font-weight: 500;
     }
 
     .notification-badge {
-      background: var(--vscode-notificationCenterHeader-background);
-      color: var(--vscode-notificationCenterHeader-foreground);
+      background: var(--vscode-badge-background);
+      color: var(--vscode-badge-foreground);
       border-radius: 10px;
       padding: 2px 8px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       margin-left: 8px;
     }
@@ -1101,11 +1171,11 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       background: var(--vscode-editor-background);
       border: 1px solid var(--vscode-panel-border);
       border-left: 3px solid var(--vscode-focusBorder);
-      border-radius: 6px;
+      border-radius: 4px;
       padding: 12px;
       margin-bottom: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
 
     .notification-item.read {
@@ -1115,7 +1185,7 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
 
     .notification-item:hover {
       border-color: var(--vscode-focusBorder);
-      transform: translateX(2px);
+      background: var(--vscode-list-hoverBackground);
     }
 
     .notification-header {
@@ -1124,20 +1194,31 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       align-items: flex-start;
       gap: 8px;
       margin-bottom: 8px;
+      flex-wrap: wrap;
     }
 
     .notification-title {
       font-weight: 600;
       color: var(--vscode-foreground);
       flex: 1;
+      font-size: 13px;
+      min-width: 0;
+      word-break: break-word;
     }
 
     .notification-meta {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-size: 11px;
       color: var(--vscode-descriptionForeground);
+      flex-wrap: wrap;
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .notification-meta > * {
+      flex-shrink: 0;
     }
 
     .notification-reason {
@@ -1147,40 +1228,56 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       padding: 2px 6px;
       background: var(--vscode-badge-background);
       color: var(--vscode-badge-foreground);
-      border-radius: 4px;
+      border-radius: 3px;
       font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
     }
 
     .notification-actions {
       display: flex;
       gap: 8px;
       margin-top: 8px;
+      flex-wrap: wrap;
     }
 
     .notification-btn {
-      padding: 4px 10px;
+      padding: 5px 10px;
       font-size: 11px;
+      font-weight: 500;
       background: var(--vscode-button-secondaryBackground);
       color: var(--vscode-button-secondaryForeground);
       border: 1px solid var(--vscode-button-border);
       border-radius: 4px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .notification-btn:hover {
       background: var(--vscode-button-secondaryHoverBackground);
     }
 
+    .notification-btn:active {
+      transform: scale(0.96);
+    }
+
     .notification-settings {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
+      padding: 10px 12px;
       background: var(--vscode-editor-background);
       border: 1px solid var(--vscode-panel-border);
-      border-radius: 6px;
+      border-radius: 4px;
       margin-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .notification-settings > label {
+      flex-shrink: 0;
     }
 
     .toggle-switch {
@@ -1230,10 +1327,10 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
     }
 
     .icon-btn {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border: 1px solid var(--vscode-panel-border);
-      border-radius: 3px;
+      border-radius: 4px;
       background: transparent;
       color: var(--vscode-foreground);
       cursor: pointer;
@@ -1243,6 +1340,7 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       font-size: 14px;
       transition: all 0.15s ease;
       flex-shrink: 0;
+      padding: 0;
     }
 
     .icon-btn:hover {
@@ -1250,10 +1348,24 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       border-color: var(--vscode-focusBorder);
     }
 
+    .icon-btn:active {
+      transform: scale(0.96);
+    }
+
+    .icon-btn.loading {
+      pointer-events: none;
+    }
+
+    .icon-btn.loading i {
+      animation: spin 0.6s linear infinite;
+    }
+
     .btn-small {
-      padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px);
-      font-size: clamp(10px, 2.5vw, 11px);
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 500;
       width: auto;
+      height: auto;
     }
   </style>
 </head>
@@ -1504,9 +1616,15 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
       if (account && account.username) {
         const currentYear = new Date().getFullYear();
         fetchContributions(account.username, currentYear);
+        // Fetch notifications immediately when account is available
         fetchNotifications(account.username);
       } else {
         updateContributionsGraph(null);
+        // Try to fetch notifications even without account (will fail gracefully if no user)
+        const username = currentContributionsUsername || (currentAccount?.username);
+        if (username) {
+          fetchNotifications(username);
+        }
       }
     }
 
@@ -1792,6 +1910,16 @@ export class ContributionsProvider implements vscode.WebviewViewProvider {
 
         // Apply theme-aware styling and tooltips to contribution squares
         setTimeout(() => {
+          // Fetch notifications after graph is successfully rendered
+          try {
+            const username = data?.username || currentContributionsUsername || (currentAccount?.username);
+            if (username) {
+              fetchNotifications(username);
+            }
+          } catch (err) {
+            console.error('Error fetching notifications:', err);
+          }
+          
           const rects = svgElement.querySelectorAll('rect');
           
           rects.forEach(rect => {
